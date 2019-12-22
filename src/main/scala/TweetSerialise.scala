@@ -35,7 +35,7 @@ object QuoteJsonProtocol extends DefaultJsonProtocol{
   }
 }
 
-case class Tweet(created_at : String, id_str : String, full_text : String, lang : String, retweeted_status: Option[Retweet],quoted_status: Option[Quote])//,in_reply_to_status_id_str:String)
+case class Tweet(created_at : String, id_str : String, full_text : String, lang : String, retweeted_status: Option[Retweet],quoted_status: Option[Quote],in_reply_to_status_id_str: Option[String])
 
 object TweetJsonProtocol extends DefaultJsonProtocol{
   import RetweetJsonProtocol._
@@ -45,16 +45,23 @@ object TweetJsonProtocol extends DefaultJsonProtocol{
 
     def read(json: JsValue): Tweet = {
       val fields = json.asJsObject.fields
-      println(fields)
+
       Tweet(
         fields("created_at").convertTo[String],
         fields("id_str").convertTo[String],
-        fields("full_text").convertTo[String],
+        fields("full_text").convertTo[String].replaceAll(System.lineSeparator(),""),
         fields("lang").convertTo[String],
         fields.get("retweeted_status").map(_.convertTo[Retweet]),
-        fields.get("quoted_status").map(_.convertTo[Quote])
-        //fields("in_reply_to_status_id_str").convertTo[String]
+        fields.get("quoted_status").map(_.convertTo[Quote]),
+        convert(fields("in_reply_to_status_id_str"))
       )
+    }
+    def convert(value: JsValue) : Option[String]={
+      value.toString()
+      match{
+        case "null" => None
+        case _ => Option(value.convertTo[String])
+      }
     }
   }
 }
@@ -68,7 +75,7 @@ object test extends App {
       |  "created_at": "Mon Nov 04 14:37:20 +0000 2019",
       |  "id": 1191363805185478656,
       |  "id_str": "1191363805185478656",
-      |  "full_text": "RT @kedehcodes: THis is what i get to do each day as a front end web developer\n#lifeofcoding\n#bitcoin \n#TechnologyNews \n#loveroftech https:\u2026",
+      |  "full_text": "RT @kedehcodes: THis is what i get to do each day as a front end web developers",
       |  "in_reply_to_status_id_str": "1191363805185478656",
       |  "lang": "en",
       |  "quoted_status": {
