@@ -2,12 +2,11 @@ import java.nio.file.Paths
 
 import spray.json._
 import TweetJsonProtocol._
-import akka.NotUsed
 import akka.actor.ActorSystem
-import akka.stream.scaladsl.{Balance, Broadcast, Compression, FileIO, Flow, Framing, GraphDSL, Merge, Sink}
+import akka.stream.scaladsl.{ Compression, FileIO, Framing, Sink, Source}
 import akka.http.scaladsl.common.JsonEntityStreamingSupport
 import akka.http.scaladsl.common.EntityStreamingSupport
-import akka.stream.FlowShape
+import akka.stream.OverflowStrategy
 import akka.util.ByteString
 import edu.stanford.nlp.graph.Graph
 import javax.swing.text.FlowView.FlowStrategy
@@ -26,6 +25,7 @@ object Spray extends App {
 
   val twetsTest = FileIO.fromPath(path).via(Compression.gunzip())
     .via(Framing.delimiter(ByteString("\n"), maximumFrameLength = 20000, allowTruncation = true))
+    .buffer(50, OverflowStrategy.backpressure)
     .map(_.utf8String)
     .filter(_!="{}")
     .map(source => source.parseJson)
@@ -33,23 +33,9 @@ object Spray extends App {
     .filter(tweet => tweet.lang == "en")
     .to(Sink.foreach(f => println(s"Tweet : '${f}'")))
 
-  twetsTest.run()
-
-
-
-  /*
-  val tweetClassifier = Flow[Tweet,Tweet,NotUsed] =
-    Flow.fromGraph(GraphDSL.create(){ implicit builder ⇒
-      val splitTweets = builder.add(Balance[Tweet](2))
-      val mergeTweets = builder.add(Merge[Tweet](2))
-      val broadTweets = builder.add(Broadcast[Tweet](1))
-
-      FlowShape(splitTweets.in,mergeTweets.out)
-    })*/
-
-
-
-
+  //twetsTest.run()
+  val source = Source(1 to 5)
+  source.scan(0)((acc, x) => acc + x).runForeach(println)
 
 }
 
