@@ -1,3 +1,4 @@
+
 import spray.json.{DefaultJsonProtocol, JsonFormat}
 import spray.json._
 
@@ -11,7 +12,7 @@ object RetweetJsonProtocol extends DefaultJsonProtocol{
       Retweet(
         fields("created_at").convertTo[String],
         fields("id_str").convertTo[String],
-        fields("full_text").convertTo[String].replaceAll(System.lineSeparator(),"").take(20),
+        fields("full_text").convertTo[String].replaceAll(System.lineSeparator(),""),
         fields("lang").convertTo[String]
       )
     }
@@ -28,7 +29,7 @@ object QuoteJsonProtocol extends DefaultJsonProtocol{
       Quote(
         fields("created_at").convertTo[String],
         fields("id_str").convertTo[String],
-        fields("full_text").convertTo[String].replaceAll(System.lineSeparator(),"").take(20),
+        fields("full_text").convertTo[String].replaceAll(System.lineSeparator(),""),
         fields("lang").convertTo[String]
       )
     }
@@ -49,7 +50,7 @@ object TweetJsonProtocol extends DefaultJsonProtocol{
       Tweet(
         fields("created_at").convertTo[String],
         fields("id_str").convertTo[String],
-        fields("full_text").convertTo[String].replaceAll(System.lineSeparator(),"").take(30),
+        fields("full_text").convertTo[String].replaceAll(System.lineSeparator(),""),
         fields("lang").convertTo[String],
         fields.get("retweeted_status").map(_.convertTo[Retweet]),
         fields.get("quoted_status").map(_.convertTo[Quote]),

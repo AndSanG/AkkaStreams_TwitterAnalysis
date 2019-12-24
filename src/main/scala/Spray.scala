@@ -8,9 +8,6 @@ import akka.http.scaladsl.common.JsonEntityStreamingSupport
 import akka.http.scaladsl.common.EntityStreamingSupport
 import akka.stream.OverflowStrategy
 import akka.util.ByteString
-import edu.stanford.nlp.graph.Graph
-import javax.swing.text.FlowView.FlowStrategy
-
 
 object Spray extends App {
 
@@ -34,9 +31,6 @@ object Spray extends App {
     .to(Sink.foreach(f => println(s"Tweet : '${f}'")))
 
   //twetsTest.run()
-  val source = Source(1 to 5)
-  source.scan(0)((acc, x) => acc + x).runForeach(println)
-
 }
 
 
