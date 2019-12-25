@@ -11,6 +11,8 @@ import spray.json._
 import TweetJsonProtocol._
 import TweetType.TweetType
 import SentimentAnalyzer.mainSentiment
+import scala.concurrent.duration._
+
 import scala.util.{Failure, Success}
 
 object TweetType extends Enumeration {
@@ -64,7 +66,7 @@ object TweetStatistics extends App {
 
   val fileSink = Flow[String]
     .map(i => ByteString(i))
-    //.throttle(1, 1000.millis)
+    .throttle(1, 1000.millis)
     .toMat(FileIO.toPath(
       new File("src/main/resources/sentiment.txt").toPath))((_, bytesWritten) => bytesWritten)
 
@@ -81,7 +83,7 @@ val tweetsGraph = GraphDSL.create(fileSink, consoleSink)((fsink, _) => fsink) { 
     in ~> tweetUnmarshaller.async ~> filterEN ~> splitTweets
 
     splitTweets.out(0) ~> bcastTweet
-    bcastTweet.out(0) ~> sentimentFlow.async ~>filer
+    bcastTweet.out(0) ~> sentimentFlow.buffer(580, OverflowStrategy.backpressure) ~>filer
     bcastTweet.out(1) ~> normalFlow ~> mergeTweets.in(0)
     splitTweets.out(1) ~> retweetFlow ~> mergeTweets.in(1)
     splitTweets.out(2) ~> quotedFlow ~> mergeTweets.in(2)
