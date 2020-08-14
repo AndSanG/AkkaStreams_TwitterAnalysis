@@ -1,4 +1,5 @@
-
+//implementation based on
+//https://medium.com/rahasak/json-handling-in-scala-spray-json-afbab0e9eaba
 import spray.json.{DefaultJsonProtocol, JsonFormat}
 import spray.json._
 

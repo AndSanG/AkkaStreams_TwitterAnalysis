@@ -1,6 +1,7 @@
 
+//impllementation from this repo
+//https://github.com/harpribot/corenlp-scala-examples/blob/master/src/main/scala/com/harpribot/corenlp_scala/SentimentAnalysisExample.scala
 import java.util.Properties
-
 import scala.collection.JavaConverters._
 import Sentiment.Sentiment
 import SentimentAnalyzer.sentiment
